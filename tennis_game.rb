@@ -23,6 +23,10 @@ class Scoreboard
     scores[player.to_s]
   end
 
+  def display
+    "Win for #{game.winner}"
+  end
+
   private
 
   attr_reader :game, :scores, :players
@@ -38,6 +42,14 @@ class TennisGame
 
   def won_point(player)
     scoreboard.score_for(player, 1)
+  end
+
+  def winner
+    p1 = players.first
+    p2 = players.last
+
+    scoreboard.score_count_for(p1) >
+    scoreboard.score_count_for(p2) ? p1 : p2
   end
 
   def score
@@ -62,9 +74,9 @@ class TennisGame
       elsif minusResult == -1
         result = "Advantage #{p2}"
       elsif minusResult >= 2
-        result = "Win for #{p1}"
+        result = scoreboard.display
       else
-        result = "Win for #{p2}"
+        result = scoreboard.display
       end
     else
       (1...3).each do |i|

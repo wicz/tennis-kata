@@ -1,12 +1,13 @@
 # encoding: utf-8
 require "test/unit"
+require "test/unit/rr"
 require_relative "./tennis_game"
 
 class TestScoreboard < Test::Unit::TestCase
   Game = Struct.new(:players)
 
   def setup
-    game    = Game.new(%w(alice bob))
+    @game   = Game.new(%w(alice bob))
     @board  = Scoreboard.new(game)
   end
 
@@ -27,8 +28,14 @@ class TestScoreboard < Test::Unit::TestCase
     assert_equal(2, board.score_count_for(:alice))
   end
 
+  def test_display_winner
+    stub(game).winner { "alice" }
+
+    assert_equal("Win for alice", board.display)
+  end
+
   private
 
-  attr_reader :board
+  attr_reader :board, :game
 end
 
