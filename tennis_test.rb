@@ -1,8 +1,8 @@
 # encoding: utf-8
-require File.join(File.dirname(__FILE__), "tennis_game_1")
-require File.join(File.dirname(__FILE__), "tennis_game_2")
-require File.join(File.dirname(__FILE__), "tennis_game_3")
 require "test/unit"
+require_relative "./tennis_game_1"
+require_relative "./tennis_game_2"
+require_relative "./tennis_game_3"
 
 TEST_CASES = [
   [0, 0, "Love-All",    "player1", "player2"],
