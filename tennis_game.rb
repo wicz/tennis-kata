@@ -28,12 +28,26 @@ class Scoreboard
       "Win for #{game.winner}"
     elsif game.advantage?
       "Advantage #{game.leader}"
+    else
+      scores_labels
     end
   end
 
   private
 
+  SCORE_LABELS = %w(Love Fifteen Thirty Forty).freeze
+
   attr_reader :game, :scores, :players
+
+  def scores_labels
+    scores.values.map do |score|
+      score_to_label(score)
+    end.join("-")
+  end
+
+  def score_to_label(score)
+    SCORE_LABELS[score]
+  end
 end
 
 class TennisGame
@@ -85,20 +99,7 @@ class TennisGame
     elsif score_a >= 4 || score_b >= 4
       result = scoreboard.display
     else
-      (1...3).each do |i|
-        if i == 1
-          tempScore = score_a
-        else
-          result += "-"
-          tempScore = score_b
-        end
-        result += {
-            0 => "Love",
-            1 => "Fifteen",
-            2 => "Thirty",
-            3 => "Forty",
-        }[tempScore]
-      end
+      result = scoreboard.display
     end
     result
   end

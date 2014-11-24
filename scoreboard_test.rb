@@ -43,6 +43,18 @@ class TestScoreboard < Test::Unit::TestCase
     assert_equal("Advantage alice", board.display)
   end
 
+  def test_display_scores
+    stub(game).winner?    { false }
+    stub(game).advantage? { false }
+
+    board.score_for(:alice)
+    assert_equal("Fifteen-Love", board.display)
+
+    board.score_for(:alice)
+    board.score_for(:bob, 3)
+    assert_equal("Thirty-Forty", board.display)
+  end
+
   private
 
   attr_reader :board, :game
