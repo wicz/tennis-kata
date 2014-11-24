@@ -7,7 +7,7 @@ class TestScoreboard < Test::Unit::TestCase
   Game = Struct.new(:players)
 
   def setup
-    @game   = Game.new(%w(alice bob))
+    @game   = Game.new(%i(alice bob))
     @board  = Scoreboard.new(game)
   end
 
@@ -29,9 +29,18 @@ class TestScoreboard < Test::Unit::TestCase
   end
 
   def test_display_winner
-    stub(game).winner { "alice" }
+    stub(game).winner?  { true }
+    stub(game).winner   { :alice }
 
     assert_equal("Win for alice", board.display)
+  end
+
+  def test_display_advantage
+    stub(game).winner?    { false }
+    stub(game).advantage? { true }
+    stub(game).leader     { :alice }
+
+    assert_equal("Advantage alice", board.display)
   end
 
   private

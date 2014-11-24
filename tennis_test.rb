@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "test/unit"
+require "test/unit/rr"
 require_relative "./tennis_game"
 require_relative "./tennis_game_1"
 require_relative "./tennis_game_2"
@@ -66,6 +67,75 @@ class TestTennis < Test::Unit::TestCase
 
   def test_implementation_3
     run_tests_for(TennisGame3)
+  end
+
+  def test_won_point
+    game = build_game
+    stub(game.scoreboard).score_for
+
+    game.won_point(:alice)
+
+    assert_received(game.scoreboard) { |board| board.score_for("alice", 1) }
+  end
+
+  def test_has_winner?
+    game = build_game
+
+    set_points(game, alice: 4)
+
+    assert_true(game.winner?)
+  end
+
+  def test_winner
+    game = build_game
+
+    set_points(game, alice: 6, bob: 4)
+
+    assert_equal("alice", game.winner)
+  end
+
+  def test_draw_has_no_winner
+    game = build_game
+
+    set_points(game, alice: 4, bob: 4)
+
+    assert_nil(game.winner)
+  end
+
+  def test_in_advantage?
+    game = build_game
+
+    set_points(game, alice: 4, bob: 3)
+
+    assert_true(game.advantage?)
+  end
+
+  def test_leader
+    game = build_game
+
+    set_points(game, alice: 4, bob: 3)
+
+    assert_equal("alice", game.leader)
+  end
+
+  def test_draw_has_no_leader
+    game = build_game
+
+    set_points(game, alice: 4, bob: 4)
+
+    assert_nil(game.leader)
+  end
+
+  private
+
+  def build_game
+    TennisGame.new(:alice, :bob)
+  end
+
+  def set_points(game, points = {})
+    points.each do |player, score|
+      score.to_i.times { game.won_point(player) }
+    end
   end
 
   def run_tests_for(klass)

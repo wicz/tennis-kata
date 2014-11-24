@@ -11,20 +11,24 @@ class Scoreboard
 
   def reset_scores_count
     players.each do |player|
-      scores[player.to_s] = 0
+      scores[player] = 0
     end
   end
 
   def score_for(player, value = 1)
-    scores[player.to_s] += value
+    scores[player] += value
   end
 
   def score_count_for(player)
-    scores[player.to_s]
+    scores[player]
   end
 
   def display
-    "Win for #{game.winner}"
+    if game.winner?
+      "Win for #{game.winner}"
+    elsif game.advantage?
+      "Advantage #{game.leader}"
+    end
   end
 
   private
@@ -33,58 +37,60 @@ class Scoreboard
 end
 
 class TennisGame
-  attr_reader :players
+  attr_reader :players, :scoreboard
 
   def initialize(*players)
-    @players    = players
+    @players    = players.map(&:to_s)
     @scoreboard = Scoreboard.new(self)
   end
 
   def won_point(player)
-    scoreboard.score_for(player, 1)
+    scoreboard.score_for(player.to_s, 1)
+  end
+
+  def winner?
+    score_delta = (score_a - score_b).abs
+
+    (score_a >= 4 || score_b >= 4) && score_delta >= 2
+  end
+
+  def advantage?
+    score_delta = (score_a - score_b).abs
+
+    score_a >= 3 && score_b >= 3 && score_delta == 1
+  end
+
+  def leader
+    return if score_a == score_b
+
+    score_a > score_b ? player_a : player_b
   end
 
   def winner
-    p1 = players.first
-    p2 = players.last
+    return unless winner?
 
-    scoreboard.score_count_for(p1) >
-    scoreboard.score_count_for(p2) ? p1 : p2
+    leader
   end
 
   def score
     result    = ""
     tempScore = 0
-    p1        = players.first
-    p2        = players.last
-    p1_score  = scoreboard.score_count_for(p1)
-    p2_score  = scoreboard.score_count_for(p2)
 
-    if p1_score == p2_score
+    if score_a == score_b
       result = {
           0 => "Love-All",
           1 => "Fifteen-All",
           2 => "Thirty-All",
-      }.fetch(p1_score, "Deuce")
-    elsif p1_score >= 4 || p2_score >= 4
-      minusResult = p1_score - p2_score
-
-      if minusResult == 1
-        result = "Advantage #{p1}"
-      elsif minusResult == -1
-        result = "Advantage #{p2}"
-      elsif minusResult >= 2
-        result = scoreboard.display
-      else
-        result = scoreboard.display
-      end
+      }.fetch(score_a, "Deuce")
+    elsif score_a >= 4 || score_b >= 4
+      result = scoreboard.display
     else
       (1...3).each do |i|
         if i == 1
-          tempScore = p1_score
+          tempScore = score_a
         else
           result += "-"
-          tempScore = p2_score
+          tempScore = score_b
         end
         result += {
             0 => "Love",
@@ -99,6 +105,20 @@ class TennisGame
 
   private
 
-  attr_reader :scoreboard
+  def player_a
+    players.first
+  end
+
+  def player_b
+    players.last
+  end
+
+  def score_a
+    scoreboard.score_count_for(player_a)
+  end
+
+  def score_b
+    scoreboard.score_count_for(player_b)
+  end
 end
 
