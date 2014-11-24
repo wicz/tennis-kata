@@ -1,5 +1,6 @@
 # encoding: utf-8
 require "test/unit"
+require_relative "./tennis_game"
 require_relative "./tennis_game_1"
 require_relative "./tennis_game_2"
 require_relative "./tennis_game_3"
@@ -51,6 +52,10 @@ TEST_CASES = [
 ]
 
 class TestTennis < Test::Unit::TestCase
+  def test_implementation
+    run_tests_for(TennisGame)
+  end
+
   def test_implementation_1
     run_tests_for(TennisGame1)
   end
