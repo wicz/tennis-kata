@@ -6,6 +6,10 @@ class Scoreboard
     @scores   = {}
     @players  = game.players
 
+    reset_scores_count
+  end
+
+  def reset_scores_count
     players.each do |player|
       scores[player.to_s] = 0
     end
@@ -21,7 +25,7 @@ class Scoreboard
 
   private
 
-  attr_accessor :game, :scores, :players
+  attr_reader :game, :scores, :players
 end
 
 class TennisGame
