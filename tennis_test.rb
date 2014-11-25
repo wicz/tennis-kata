@@ -79,71 +79,81 @@ class TestTennis < Test::Unit::TestCase
   end
 
   def test_has_winner?
-    game = build_game
-
-    set_points(game, alice: 4)
+    game = build_game(alice: 4)
 
     assert_true(game.winner?)
   end
 
   def test_winner
-    game = build_game
-
-    set_points(game, alice: 6, bob: 4)
+    game = build_game(alice: 6, bob: 4)
 
     assert_equal("alice", game.winner)
   end
 
   def test_tie_has_no_winner
-    game = build_game
-
-    set_points(game, alice: 4, bob: 4)
+    game = build_game(alice: 4, bob: 4)
 
     assert_nil(game.winner)
   end
 
   def test_in_advantage?
-    game = build_game
-
-    set_points(game, alice: 4, bob: 3)
+    game = build_game(alice: 4, bob: 3)
 
     assert_true(game.advantage?)
   end
 
   def test_leader
-    game = build_game
-
-    set_points(game, alice: 4, bob: 3)
+    game = build_game(alice: 4, bob: 3)
 
     assert_equal("alice", game.leader)
   end
 
   def test_tie_has_no_leader
-    game = build_game
-
-    set_points(game, alice: 4, bob: 4)
+    game = build_game(alice: 4, bob: 4)
 
     assert_nil(game.leader)
   end
 
   def test_is_deuce?
-    game = build_game
-
-    set_points(game, alice: 3, bob: 3)
+    game = build_game(alice: 3, bob: 3)
 
     assert_true(game.deuce?)
   end
 
-  private
+  def test_state_win
+    game = build_game(alice: 6, bob: 4)
 
-  def build_game
-    TennisGame.new(:alice, :bob)
+    assert_equal(:winner, game.state)
   end
 
-  def set_points(game, points = {})
+  def test_state_advantage
+    game = build_game(alice: 4, bob: 3)
+
+    assert_equal(:advantage, game.state)
+  end
+
+  def test_state_deuce
+    game = build_game(alice: 3, bob: 3)
+
+    assert_equal(:deuce, game.state)
+  end
+
+  def test_state_scores
+    game = build_game(alice: 1)
+
+    assert_equal(:scores, game.state)
+  end
+
+  private
+
+  def build_game(points = {})
+    game = TennisGame.new(:alice, :bob)
+
     points.each do |player, score|
       score.to_i.times { game.won_point(player) }
     end
+
+    game
   end
 
   def run_tests_for(klass)

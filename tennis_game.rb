@@ -24,15 +24,7 @@ class Scoreboard
   end
 
   def display
-    if game.winner?
-      "Win for #{game.winner}"
-    elsif game.advantage?
-      "Advantage #{game.leader}"
-    elsif game.deuce?
-      "Deuce"
-    else
-      scores_labels
-    end
+    send("display_#{game.state}")
   end
 
   private
@@ -55,6 +47,22 @@ class Scoreboard
 
   def score_to_label(score)
     SCORE_LABELS[score]
+  end
+
+  def display_winner
+    "Win for #{game.winner}"
+  end
+
+  def display_advantage
+    "Advantage #{game.leader}"
+  end
+
+  def display_deuce
+    "Deuce"
+  end
+
+  def display_scores
+    scores_labels
   end
 end
 
@@ -100,6 +108,18 @@ class TennisGame
 
   def score
     scoreboard.display
+  end
+
+  def state
+    if winner?
+      :winner
+    elsif advantage?
+      :advantage
+    elsif deuce?
+      :deuce
+    else
+      :scores
+    end
   end
 
   private

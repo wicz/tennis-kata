@@ -1,11 +1,12 @@
 # encoding: utf-8
 require "test/unit"
 require "test/unit/rr"
+require "ostruct"
 require_relative "./tennis_game"
 
 class TestScoreboard < Test::Unit::TestCase
   def setup
-    @game   = build_game
+    @game   = OpenStruct.new(players: %i(alice bob))
     @board  = Scoreboard.new(game)
   end
 
@@ -27,20 +28,22 @@ class TestScoreboard < Test::Unit::TestCase
   end
 
   def test_display_winner
-    stub(game).winner?  { true }
-    stub(game).winner   { :alice }
+    stub(game).state  { :winner }
+    stub(game).winner { :alice }
 
     assert_equal("Win for alice", board.display)
   end
 
   def test_display_advantage
-    stub(game).advantage? { true }
-    stub(game).leader     { :alice }
+    stub(game).state  { :advantage }
+    stub(game).leader { :alice }
 
     assert_equal("Advantage alice", board.display)
   end
 
   def test_display_scores
+    stub(game).state { :scores }
+
     board.score_for(:alice)
     assert_equal("Fifteen-Love", board.display)
 
@@ -53,7 +56,7 @@ class TestScoreboard < Test::Unit::TestCase
   end
 
   def test_display_deuce
-    stub(game).deuce? { true }
+    stub(game).state { :deuce }
 
     assert_equal("Deuce", board.display)
   end
@@ -61,17 +64,5 @@ class TestScoreboard < Test::Unit::TestCase
   private
 
   attr_reader :board, :game
-
-  Game = Struct.new(:players)
-
-  def build_game
-    game = Game.new(%i(alice bob))
-
-    stub(game).winner?    { false }
-    stub(game).advantage? { false }
-    stub(game).deuce?     { false }
-
-    game
-  end
 end
 
