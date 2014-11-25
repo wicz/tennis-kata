@@ -4,10 +4,8 @@ require "test/unit/rr"
 require_relative "./tennis_game"
 
 class TestScoreboard < Test::Unit::TestCase
-  Game = Struct.new(:players)
-
   def setup
-    @game   = Game.new(%i(alice bob))
+    @game   = build_game
     @board  = Scoreboard.new(game)
   end
 
@@ -36,7 +34,6 @@ class TestScoreboard < Test::Unit::TestCase
   end
 
   def test_display_advantage
-    stub(game).winner?    { false }
     stub(game).advantage? { true }
     stub(game).leader     { :alice }
 
@@ -44,19 +41,37 @@ class TestScoreboard < Test::Unit::TestCase
   end
 
   def test_display_scores
-    stub(game).winner?    { false }
-    stub(game).advantage? { false }
-
     board.score_for(:alice)
     assert_equal("Fifteen-Love", board.display)
 
     board.score_for(:alice)
     board.score_for(:bob, 3)
     assert_equal("Thirty-Forty", board.display)
+
+    board.score_for(:alice)
+    assert_equal("Forty-All", board.display)
+  end
+
+  def test_display_deuce
+    stub(game).deuce? { true }
+
+    assert_equal("Deuce", board.display)
   end
 
   private
 
   attr_reader :board, :game
+
+  Game = Struct.new(:players)
+
+  def build_game
+    game = Game.new(%i(alice bob))
+
+    stub(game).winner?    { false }
+    stub(game).advantage? { false }
+    stub(game).deuce?     { false }
+
+    game
+  end
 end
 

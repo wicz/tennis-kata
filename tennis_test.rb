@@ -94,7 +94,7 @@ class TestTennis < Test::Unit::TestCase
     assert_equal("alice", game.winner)
   end
 
-  def test_draw_has_no_winner
+  def test_tie_has_no_winner
     game = build_game
 
     set_points(game, alice: 4, bob: 4)
@@ -118,12 +118,20 @@ class TestTennis < Test::Unit::TestCase
     assert_equal("alice", game.leader)
   end
 
-  def test_draw_has_no_leader
+  def test_tie_has_no_leader
     game = build_game
 
     set_points(game, alice: 4, bob: 4)
 
     assert_nil(game.leader)
+  end
+
+  def test_is_deuce?
+    game = build_game
+
+    set_points(game, alice: 3, bob: 3)
+
+    assert_true(game.deuce?)
   end
 
   private

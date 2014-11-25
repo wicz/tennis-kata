@@ -28,6 +28,8 @@ class Scoreboard
       "Win for #{game.winner}"
     elsif game.advantage?
       "Advantage #{game.leader}"
+    elsif game.deuce?
+      "Deuce"
     else
       scores_labels
     end
@@ -40,9 +42,15 @@ class Scoreboard
   attr_reader :game, :scores, :players
 
   def scores_labels
-    scores.values.map do |score|
+    labels = scores.values.map do |score|
       score_to_label(score)
-    end.join("-")
+    end.uniq
+
+    if labels.length == 1
+      labels << "All"
+    end
+
+    labels.join("-")
   end
 
   def score_to_label(score)
@@ -86,22 +94,12 @@ class TennisGame
     leader
   end
 
-  def score
-    result    = ""
-    tempScore = 0
+  def deuce?
+    score_a == score_b && score_a >= 3
+  end
 
-    if score_a == score_b
-      result = {
-          0 => "Love-All",
-          1 => "Fifteen-All",
-          2 => "Thirty-All",
-      }.fetch(score_a, "Deuce")
-    elsif score_a >= 4 || score_b >= 4
-      result = scoreboard.display
-    else
-      result = scoreboard.display
-    end
-    result
+  def score
+    scoreboard.display
   end
 
   private
