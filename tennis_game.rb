@@ -111,15 +111,9 @@ class TennisGame
   end
 
   def state
-    if winner?
-      :winner
-    elsif advantage?
-      :advantage
-    elsif deuce?
-      :deuce
-    else
-      :scores
-    end
+    state = %i(winner advantage deuce).find { |state| send("#{state}?") }
+
+    state || :scores
   end
 
   private
